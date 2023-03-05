@@ -1,0 +1,36 @@
+0: 8 11
+
+8: 42
+11: 42 31
+
+42: babbb|baabb|bbaab|bbabb|bbbab|bbbbb|abbbb|aabbb|aaabb|aaaab|aaaba|ababa|bbbba|aaaaa|baaaa|bbaaa
+31: bbaba|bbbaa|babab|babaa|babba|baaba|baaab|ababb|abaab|abbab|abaaa|abbaa|abbba|aabab|aabaa|aabba
+
+9:  babb|baab|bbaa|bbab|bbba|bbbb|abbb|aabb|aaab|aaaa
+13: babb|baab|bbab|baaa|bbaa|bbba|abab|abaa|abba
+17: baba|bbaa|abab|abaa|abba|aaba|aaab
+10: aaab|abab|bbbb|aaaa|baaa|bbaa
+3:  abb|aab|bab|aaa|baa|bba
+27: abb|aab|baa|bab|bba|bbb
+7:  bab|baa|bba|aba|aab
+26: bbb|abb|aab|aaa
+28: aaa|baa|bba
+23: aaa|aba|bbb
+12: bab|baa|bba
+2:  aba|baa
+18: aa|ab|ba|bb
+20: bb|ab|aa
+5:  ab|aa|ba
+16: aa|ba|bb
+6:  bb|ab
+21: ba|ab
+25: aa|ab
+19: ba|bb
+22: bb
+24: ba
+4:  aa
+15: a|b
+1:  "a"
+14: "b"
+
+baabb aaaab baaaa babba ababb

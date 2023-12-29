@@ -36,24 +36,24 @@ public class Day14 extends AdventSolution {
 				.map(Point::getY).mapToLong(y -> maxY + 1 - y).sum();
 	}
 
-	private void printGrid(Map<Point, RockType> grid) {
-		var maxX = Point.maxX(grid.keySet());
-		var maxY = Point.maxY(grid.keySet());
-		for (var y = 0L; y <= maxY; y++) {
-			for (var x = 0L; x <= maxX; x++) {
-				var typeAtPos = grid.get(new Point(x, y));
-				if (typeAtPos == null) {
-					typeAtPos = RockType.EMPTY;
-				}
-				System.out.print(switch (typeAtPos) {
-				case SOLID -> '#';
-				case MOVABLE -> 'O';
-				default -> '.';
-				});
-			}
-			System.out.println();
-		}
-	}
+//	private void printGrid(Map<Point, RockType> grid) {
+//		var maxX = Point.maxX(grid.keySet());
+//		var maxY = Point.maxY(grid.keySet());
+//		for (var y = 0L; y <= maxY; y++) {
+//			for (var x = 0L; x <= maxX; x++) {
+//				var typeAtPos = grid.get(new Point(x, y));
+//				if (typeAtPos == null) {
+//					typeAtPos = RockType.EMPTY;
+//				}
+//				System.out.print(switch (typeAtPos) {
+//				case SOLID -> '#';
+//				case MOVABLE -> 'O';
+//				default -> '.';
+//				});
+//			}
+//			System.out.println();
+//		}
+//	}
 
 	@Override
 	public Object part2Solution() {

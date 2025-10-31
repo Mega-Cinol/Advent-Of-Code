@@ -55,6 +55,11 @@ public class Point implements Serializable {
 		return move(change.coordinates);
 	}
 
+	public Point multiply(long value) {
+		return new Point(coordinates.stream()
+				.map(v -> v * value)
+				.toList());
+	}
 	public Point negate() {
 		List<Long> negated = new ArrayList<>();
 		for (Long d : coordinates) {

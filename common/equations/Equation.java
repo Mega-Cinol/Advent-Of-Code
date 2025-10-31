@@ -41,7 +41,7 @@ public record Equation(List<Expression> left, List<Expression> right) {
 		var finalLeftExpression = newLeft.stream().reduce(Expression::plus).get()
 				.minus(newRight.stream().reduce(Expression::plus).get());
 		return new Equation(List.of(finalLeftExpression),
-				List.of(new Expression(List.of(new Nomynal(0, List.of())), null)));
+				List.of(new Expression(List.of(new Nominal(Fraction.parse("0"), List.of())), null)));
 	}
 
 	public Equation setVarValue(String varName, long value) {
@@ -67,8 +67,8 @@ public record Equation(List<Expression> left, List<Expression> right) {
 			throw new RuntimeException("Something wrong with normalization: " + normalizedEquation);
 		}
 		var leftNomynals = leftExpression.divided();
-		var newDivided = new ArrayList<Nomynal>();
-		var newDivisor = new ArrayList<Nomynal>();
+		var newDivided = new ArrayList<Nominal>();
+		var newDivisor = new ArrayList<Nominal>();
 		for (var nomynal : leftNomynals) {
 			if (nomynal.hasVariable(variableName)) {
 				var variable = nomynal.getVariable(variableName);
@@ -93,9 +93,9 @@ public record Equation(List<Expression> left, List<Expression> right) {
 			throw new RuntimeException("Something wrong with normalization: " + normalizedEquation);
 		}
 		var leftNomynals = leftExpression.divided();
-		var aNomynals = new ArrayList<Nomynal>();
-		var bNomynals = new ArrayList<Nomynal>();
-		var cNomynals = new ArrayList<Nomynal>();
+		var aNomynals = new ArrayList<Nominal>();
+		var bNomynals = new ArrayList<Nominal>();
+		var cNomynals = new ArrayList<Nominal>();
 		for (var nomynal : leftNomynals) {
 			if (nomynal.hasVariable(variableName)) {
 				var variable = nomynal.getVariable(variableName);
@@ -122,7 +122,7 @@ public record Equation(List<Expression> left, List<Expression> right) {
 	public static Equation buildSquareEquation(Map<String, Expression> squareConstants, Expression squareVariable) {
 		var variableSquared = squareVariable.square().multiply(squareConstants.get("a"));
 		var variableLined = squareVariable.multiply(squareConstants.get("b"));
-		return new Equation(List.of(variableSquared, variableLined, squareConstants.get("c")), List.of(new Expression(List.of(new Nomynal(0, List.of())), null))).normalize();
+		return new Equation(List.of(variableSquared, variableLined, squareConstants.get("c")), List.of(new Expression(List.of(new Nominal(Fraction.parse("0"), List.of())), null))).normalize();
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,6 +29,10 @@ public class Input {
 
 	public static <T> Map<Point, T> parseGrid(String path, Function<Character, T> converter) {
 		var input = parseLines(path).toList();
+		return parseGrid(input, converter);
+	}
+
+	public static <T> Map<Point, T> parseGrid(List<String> input, Function<Character, T> converter) {
 		var grid = new HashMap<Point, T>();
 		for (int y = 0 ; y < input.size() ; y++) {
 			for (int x = 0 ; x < input.get(y).length() ; x++) {

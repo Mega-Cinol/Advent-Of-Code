@@ -3,37 +3,43 @@ package common.equations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
+public record Expression(List<Nominal> divided, List<Nominal> divisor) {
 	public static Expression parse(String description) {
 		var splitDescription = description.replaceAll("\\s*", "").split("/");
 		var divided = Arrays.stream(splitDescription[0].split("\\+"))
-				.filter(s -> s != null && !s.isBlank())
-				.map(Nomynal::parse)
+				.filter(s -> !s.isBlank())
+				.map(Nominal::parse)
 				.toList();
-		var divisors = splitDescription.length > 1 ? Arrays.stream(splitDescription[0].replaceAll("-", "+-").split("\\+"))
-				.map(Nomynal::parse)
+		var divisors = splitDescription.length > 1 ? Arrays.stream(splitDescription[1].replaceAll("-", "+-").split("\\+"))
+				.map(Nominal::parse)
 				.toList() : null;
 		return new Expression(divided, divisors);
 	}
 	public Expression minus(Expression other) {
 		if (divisor != null || other.divisor != null) {
-			throw new UnsupportedOperationException();
+			if (divisor == null || !divisor.equals(other.divisor)) {
+				throw new UnsupportedOperationException();
+			}
 		}
-		var newNomynals = new ArrayList<>(divided);
-		other.divided.stream().map(nomynal -> nomynal.multiply(-1)).forEach(newNomynals::add);
-		return new Expression(normalizeNomynals(newNomynals), null);
+		var newNominals = new ArrayList<>(divided);
+		other.divided.stream().map(nominal -> nominal.multiply(-1)).forEach(newNominals::add);
+		return new Expression(normalizeNominals(newNominals), divisor);
 	}
 
 	public Expression plus(Expression other) {
 		if (divisor != null || other.divisor != null) {
-			throw new UnsupportedOperationException();
+			if (divisor == null || !divisor.equals(other.divisor)) {
+				throw new UnsupportedOperationException();
+			}
 		}
-		var newNomynals = new ArrayList<>(divided);
-		newNomynals.addAll(other.divided);
-		return new Expression(normalizeNomynals(newNomynals), null);
+		var newNominals = new ArrayList<>(divided);
+        newNominals.addAll(other.divided);
+		return new Expression(normalizeNominals(newNominals), divisor);
 	}
 
 	public Expression multiply(Expression other) {
@@ -42,14 +48,20 @@ public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
 		return new Expression(newDivided, newDivisor);
 	}
 
-	private List<Nomynal> multiply(List<Nomynal> a, List<Nomynal> b) {
-		var newNomynals = new ArrayList<Nomynal>();
-		for (var aNomynal : a) {
-			for (var bNomynal : b) {
-				newNomynals.add(aNomynal.multiply(bNomynal));
+	public Expression divide(Expression other) {
+		var newDivided = other.divisor == null ? divided : multiply(divided, other.divisor);
+		var newDivisor = divisor == null ? other.divided : multiply(divisor, other.divided);
+		return new Expression(newDivided, newDivisor);
+	}
+
+	private List<Nominal> multiply(List<Nominal> a, List<Nominal> b) {
+		var newNominals = new ArrayList<Nominal>();
+		for (var aNominal : a) {
+			for (var bNominal : b) {
+				newNominals.add(aNominal.multiply(bNominal));
 			}
 		}
-		return normalizeNomynals(newNomynals);
+		return normalizeNominals(newNominals);
 	}
 
 	public Expression square() {
@@ -62,10 +74,10 @@ public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
 	}
 
 	public Expression setVarValue(String varName, long value) {
-		var newDivided = normalizeNomynals(new ArrayList<Nomynal>(
+		var newDivided = normalizeNominals(new ArrayList<Nominal>(
 				divided.stream().map(n -> n.setVarValue(varName, value)).toList()));
 		var newDivisor = divisor == null ? null
-				: normalizeNomynals(new ArrayList<Nomynal>(
+				: normalizeNominals(new ArrayList<Nominal>(
 						divisor.stream().map(n -> n.setVarValue(varName, value)).toList()));
 		return new Expression(newDivided, newDivisor);
 	}
@@ -74,17 +86,17 @@ public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
 		if (divisor != null && !divisor.isEmpty() && ((divisor.size() > 1) || !divisor.get(0).hasNumericValue())) {
 			throw new UnsupportedOperationException();
 		}
-		var withVariable = new ArrayList<Nomynal>();
-		var withoutVariable = new ArrayList<Nomynal>();
-		for (var nomynal : divided) {
-			if (nomynal.hasVariable(varName)) {
-				var variable = nomynal.getVariable(varName);
+		var withVariable = new ArrayList<Nominal>();
+		var withoutVariable = new ArrayList<Nominal>();
+		for (var nominal : divided) {
+			if (nominal.hasVariable(varName)) {
+				var variable = nominal.getVariable(varName);
 				if (variable.exp() != 1) {
 					throw new UnsupportedOperationException();
 				}
-				withVariable.add(nomynal.setVarValue(varName, 1));
+				withVariable.add(nominal.setVarValue(varName, 1));
 			} else {
-				withoutVariable.add(nomynal);
+				withoutVariable.add(nominal);
 			}
 		}
 		var withVariableExpression = new Expression(withVariable, null);
@@ -94,35 +106,41 @@ public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
 		var newDivided = withVariableExpression.multiply(newValueDividedExpression)
 				.plus(withoutVariableExpression.multiply(newValueDivisorExpression));
 		var newDivisor = divisor == null || divisor.isEmpty() ? value.divisor() : value.divisor().stream()
-				.map(nomynal -> nomynal.multiply(divisor.get(0).getNumericValue()))
+				.map(nominal -> nominal.multiply(divisor.get(0).getNumericValue()))
 				.toList();
 		return new Expression(newDivided.divided(), newDivisor);
 	}
 
-	private List<Nomynal> normalizeNomynals(List<Nomynal> nomynals) {
-		var groupedNomynals = nomynals.stream().collect(
-				Collectors.groupingBy(Nomynal::variables, Collectors.summarizingLong(Nomynal::multiplier)));
-		return groupedNomynals.entrySet().stream().filter(e -> e.getValue().getSum() != 0)
-				.map(e -> new Nomynal(e.getValue().getSum(), e.getKey())).toList();
+	private List<Nominal> normalizeNominals(List<Nominal> nominals) {
+		var groupedNominals = nominals.stream().collect(
+                Collectors.toMap(Nominal::variables, Function.identity(), Nominal::add));
+		return groupedNominals.entrySet().stream().filter(e -> e.getValue().multiplier().top() != 0)
+				.map(e -> new Nominal(e.getValue().multiplier(), e.getKey())).toList();
 	}
 
 	public boolean hasNumericValue() {
-		var allNomynals = divisor == null ? divided.stream() : Stream.concat(divided.stream(), divisor.stream());
-		return divided.isEmpty() || allNomynals.allMatch(Nomynal::hasNumericValue);
+		var allNominals = divisor == null ? divided.stream() : Stream.concat(divided.stream(), divisor.stream());
+		return divided.isEmpty() || allNominals.allMatch(Nominal::hasNumericValue);
 	}
 
-	public long getDividedNumericValue() {
-		return divided.stream().mapToLong(Nomynal::getNumericValue).sum();
+	public Fraction getDividedNumericValue() {
+		return divided.stream().map(Nominal::getNumericValue).reduce(Fraction::add).orElse(Fraction.parse("0"));
 	}
 
-	public long getDivisorNumericValue() {
-		return divisor == null || divisor.isEmpty() ? 1 : divisor.stream().mapToLong(Nomynal::getNumericValue).sum();
+	public Fraction getDivisorNumericValue() {
+		return divisor == null || divisor.isEmpty() ? Fraction.parse("1") : divisor.stream().map(Nominal::getNumericValue).reduce(Fraction::add).get();
+	}
+
+	public Fraction getNumericValueFraction() {
+		var dividedVal = getDividedNumericValue();
+		var divisorVal = getDivisorNumericValue();
+		return dividedVal.divide(divisorVal);
 	}
 
 	public double getNumericValue() {
 		var dividedVal = getDividedNumericValue();
 		var divisorVal = getDivisorNumericValue();
-		return (double)dividedVal/divisorVal;
+		return dividedVal.divide(divisorVal).toDouble();
 	}
 
 	@Override
@@ -130,11 +148,11 @@ public record Expression(List<Nomynal> divided, List<Nomynal> divisor) {
 		if (divided.isEmpty()) {
 			return "0";
 		}
-		var topPart = divided.stream().map(Nomynal::toString).collect(Collectors.joining("+")).replace("+-", "-");
+		var topPart = divided.stream().map(Nominal::toString).collect(Collectors.joining("+")).replace("+-", "-");
 		if (divisor == null) {
 			return topPart;
 		}
-		var bottomPart = divisor.stream().map(Nomynal::toString).collect(Collectors.joining("+")).replace("+-",
+		var bottomPart = divisor.stream().map(Nominal::toString).collect(Collectors.joining("+")).replace("+-",
 				"-");
 		if (divided.size() > 1) {
 			topPart = "(" + topPart + ")";

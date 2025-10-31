@@ -19,7 +19,17 @@ public enum Direction {
 		this.dy = dy;
 	}
 
-	public int getDx()
+    public static Direction fromCharacter(char c) {
+		return switch (c) {
+			case '^' -> UP;
+			case 'v' -> DOWN;
+			case '<' -> LEFT;
+			case '>' -> RIGHT;
+			default -> throw new IllegalArgumentException("Unexpected character " + c);
+		};
+    }
+
+    public int getDx()
 	{
 		return dx;
 	}
@@ -105,5 +115,22 @@ public enum Direction {
 			return DOWN;
 		}
 		return null;
+	}
+
+	public static Direction betweenPoints(Point from, Point to) {
+		if (from.getDimensionSize() != 2 || to.getDimensionSize() != 2) {
+			throw new IllegalArgumentException("From %s, To %s".formatted(from, to));
+		}
+		if (from.equals(to)) {
+			throw new IllegalArgumentException("From %s, To %s".formatted(from, to));
+		}
+		if (from.getX() != to.getX() && from.getY() != to.getY()) {
+			throw new IllegalArgumentException("From %s, To %s".formatted(from, to));
+		}
+		if (from.getX() == to.getX()) {
+			return from.getY() > to.getY() ? UP : DOWN;
+		} else {
+			return from.getX() > to.getX() ? LEFT : RIGHT;
+		}
 	}
 }

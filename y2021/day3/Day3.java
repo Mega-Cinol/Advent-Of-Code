@@ -23,7 +23,7 @@ public class Day3 {
 		int gamma = 0;
 		int epsilon = 0;
 		for (int dim = numbersDigits.getDimensionSize() - 1; dim >= 0; dim--) {
-			if (numbersDigits.getDimenssion(dim) > HALF_INPUT_SIZE) {
+			if (numbersDigits.getDimension(dim) > HALF_INPUT_SIZE) {
 				gamma += Math.pow(2, numbersDigits.getDimensionSize() - dim - 1);
 			} else {
 				epsilon += Math.pow(2, numbersDigits.getDimensionSize() - dim - 1);
@@ -43,7 +43,7 @@ public class Day3 {
 		while (oxygenCandidates.size() > 1 && bitIndex < candidates.get(0).getDimensionSize()) {
 			int bitIndexCopy = bitIndex;
 			int expectedBit = getExpectedBit(oxygenCandidates, bitIndex);
-			oxygenCandidates = oxygenCandidates.stream().filter(p -> p.getDimenssion(bitIndexCopy) == expectedBit)
+			oxygenCandidates = oxygenCandidates.stream().filter(p -> p.getDimension(bitIndexCopy) == expectedBit)
 					.collect(Collectors.toList());
 			bitIndex++;
 		}
@@ -52,16 +52,16 @@ public class Day3 {
 		while (co2Candidates.size() > 1 && bitIndex < candidates.get(0).getDimensionSize()) {
 			int bitIndexCopy = bitIndex;
 			int expectedBit = 1 - getExpectedBit(co2Candidates, bitIndex);
-			co2Candidates = co2Candidates.stream().filter(p -> p.getDimenssion(bitIndexCopy) == expectedBit)
+			co2Candidates = co2Candidates.stream().filter(p -> p.getDimension(bitIndexCopy) == expectedBit)
 					.collect(Collectors.toList());
 			bitIndex++;
 		}
 		int oxygenValue = 0;
 		int co2Value = 0;
 		for (int dim = numbersDigits.getDimensionSize() - 1; dim >= 0; dim--) {
-			oxygenValue += oxygenCandidates.get(0).getDimenssion(dim)
+			oxygenValue += oxygenCandidates.get(0).getDimension(dim)
 					* Math.pow(2, oxygenCandidates.get(0).getDimensionSize() - dim - 1);
-			co2Value += co2Candidates.get(0).getDimenssion(dim)
+			co2Value += co2Candidates.get(0).getDimension(dim)
 					* Math.pow(2, co2Candidates.get(0).getDimensionSize() - dim - 1);
 		}
 		System.out.println(numbersDigits);
@@ -73,7 +73,7 @@ public class Day3 {
 	private static int getExpectedBit(List<Point> points, int position) {
 		int expected = 0;
 		for (int i = 0; i < points.size(); i++) {
-			if (points.get(i).getDimenssion(position) == 1) {
+			if (points.get(i).getDimension(position) == 1) {
 				expected++;
 			} else {
 				expected--;

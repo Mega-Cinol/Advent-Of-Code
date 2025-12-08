@@ -18,6 +18,7 @@ public class Day3 {
 			}
 			return rowTrees;
 		}, slope::addRow);
+        System.out.println(countTrees(3, 1, slope));
 		long result = 1;
 		result *= countTrees(1, 1, slope);
 		result *= countTrees(3, 1, slope);

@@ -20,6 +20,7 @@ public class Day4 {
 	public static void main(String[] args) {
 		PassportRegistry registry = new PassportRegistry();
 		Input.parseLines("y2020/day4/day4.txt", Function.identity(), registry);
+        System.out.println(registry.countRequiredFields());
 		System.out.println(registry.countValid());
 	}
 
@@ -42,7 +43,11 @@ public class Day4 {
 		public long countValid() {
 			return passports.stream().filter(Passport::isValid).count();
 		}
-	}
+
+        public long countRequiredFields() {
+            return passports.stream().filter(Passport::hasRequiredFields).count();
+        }
+    }
 
 	private static class Passport {
 		private static final Pattern PATTERN = Pattern.compile("(?<key>[^\\ ]+):(?<value>[^\\ ]+)");
@@ -98,7 +103,11 @@ public class Day4 {
 		{
 			return properties.toString();
 		}
-	}
+
+        public boolean hasRequiredFields() {
+            return REQUIRED_KEYS.keySet().stream().allMatch(properties::containsKey);
+        }
+    }
 
 	private static class NotNullPredicate implements Predicate<String> {
 		@Override

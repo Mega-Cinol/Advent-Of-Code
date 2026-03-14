@@ -1,6 +1,9 @@
 package common.equations;
 
 public record Fraction(long top, long bottom) {
+    public Fraction(long top) {
+        this(top, 1);
+    }
     public static Fraction parse(String fractionDesc) {
         var fractionParts = fractionDesc.split("/");
         var top = Long.parseLong(fractionParts[0]);
@@ -76,12 +79,59 @@ public record Fraction(long top, long bottom) {
         return subtract(other).isZero();
     }
 
-    public boolean isEqual(Long other) {
+    public boolean isEqual(long other) {
         return subtract(other).isZero();
     }
 
+    public boolean isGreaterThan(Fraction other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() > 0;
+    }
+
+    public boolean isGreaterThan(long other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() > 0;
+    }
+
+    public boolean isGreaterThanOrEqual(Fraction other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() >= 0;
+    }
+
+    public boolean isGreaterThanOrEqual(long other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() >= 0;
+    }
+
+    public boolean isLessThan(Fraction other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() < 0;
+    }
+
+    public boolean isLessThan(long other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() < 0;
+    }
+
+    public boolean isLessThanOrEqual(Fraction other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() <= 0;
+    }
+
+    public boolean isLessThanOrEqual(long other) {
+        var diff = subtract(other);
+        return diff.top() * diff.bottom() <= 0;
+    }
+
+    public Fraction abs() {
+        return new Fraction(Math.abs(top), Math.abs(bottom));
+    }
     public boolean isZero() {
         return top == 0;
+    }
+    public boolean isInt() {
+        var normalized = normalize();
+        return normalized.bottom == 1 || normalized.bottom == -1;
     }
 
     private long greatestCommonFactor() {
